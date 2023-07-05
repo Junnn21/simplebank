@@ -6,6 +6,7 @@ package db
 
 import (
 	"database/sql"
+	"time"
 )
 
 type Account struct {
@@ -31,4 +32,13 @@ type Transfer struct {
 	// must be positive
 	Amount    int64
 	CreatedAt sql.NullTime
+}
+
+type User struct {
+	Username          string
+	HashedPassword    string
+	FullName          string
+	Email             string
+	PasswordChangedAt time.Time
+	CreatedAt         sql.NullTime
 }
