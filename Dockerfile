@@ -13,8 +13,8 @@ COPY --from=builder /app/main .
 COPY --from=builder /app/LICENSE ./migrate
 COPY --from=builder /app/README.md ./migrate
 COPY --from=builder /app/migrate ./migrate
-COPY start.sh .
 COPY app.env .
+COPY start.sh .
 COPY db/migration ./migration
 RUN ["chmod", "+x", "./start.sh"]
 
