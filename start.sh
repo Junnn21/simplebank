@@ -3,6 +3,7 @@
 set -e
 
 echo "run db migration"
+
 set -a            
 source /app/app.env
 set +a
