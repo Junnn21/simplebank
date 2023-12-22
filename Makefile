@@ -42,7 +42,7 @@ mock:
 preproto: 
 	del pb/*.go
 	del doc/swagger/*.swagger.json
-	del statik/*.go
+	del doc/statik/*.go
 
 proto:
 	protoc --proto_path=proto --go_out=pb --go_opt=paths=source_relative \

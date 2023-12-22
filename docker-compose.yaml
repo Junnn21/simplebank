@@ -6,10 +6,6 @@ services:
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=secret
       - POSTGRES_DB=simple_bank
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -q -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
-    volumes:
-      - data-volume:/var/lib/postgresql/data
   api:
     build:
       context: .
@@ -19,8 +15,7 @@ services:
     environment:
       - DB_SOURCE=postgresql://root:secret@postgres:5432/simple_bank?sslmode=disable
     depends_on:
-      postgres:
-        condition: service_healthy
+      - postgres
     entrypoint:
       [
         "/app/wait-for.sh",
@@ -29,6 +24,4 @@ services:
         "/app/start.sh"
       ]
     command: [ "/app/main" ]
-volumes:
-  data-volume:
     
