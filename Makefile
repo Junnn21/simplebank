@@ -21,6 +21,9 @@ migratedown1:
 migrateup1:
 	migrate -path db/migration -database "$(DB_URL)" -verbose up 1
 
+new_migration:
+	migrate create -ext sql -dir db/migration -seq $(name)
+
 db_docs:
 	dbdocs build doc/db.dbml
 
@@ -31,20 +34,19 @@ sqlc:
 	docker run --rm -v ".:/src" -w /src kjconroy/sqlc generate
 
 test:
-	go test -v -cover ./...
+	go test -v -cover -short ./...
 
 server:
 	go run main.go
 
 mock:
-	mockgen --build_flags=--mod=mod -destination db/mock/store.go github.com/techschool/simplebank/db/sqlc Store
-
-preproto: 
-	del pb/*.go
-	del doc/swagger/*.swagger.json
-	del doc/statik/*.go
+	mockgen -package mockdb -destination db/mock/store.go github.com/techschool/simplebank/db/sqlc Store
+	mockgen -package mockwk -destination worker/mock/distributor.go github.com/techschool/simplebank/worker TaskDistributor
 
 proto:
+	del pb\*.go &
+	del doc\swagger\*.swagger.json &
+	del doc\statik\*.go &
 	protoc --proto_path=proto --go_out=pb --go_opt=paths=source_relative \
 	--go-grpc_out=pb --go-grpc_opt=paths=source_relative \
 	--grpc-gateway_out=pb --grpc-gateway_opt=paths=source_relative \
@@ -55,4 +57,7 @@ proto:
 evans:
 	../evans --host localhost --port 9090 -r repl 
 
-.PHONY: postgres createdb dropdb migrateup migratedown sqlc test server mock migrateup1 migratedown1 db_docs db_schema proto evans
+redis:
+	docker run --name redis -p 6379:6379 -d redis:7-alpine
+
+.PHONY: postgres createdb dropdb migrateup migratedown sqlc test server mock migrateup1 migratedown1 db_docs db_schema proto evans redis new_migration
